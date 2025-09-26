@@ -1,5 +1,6 @@
 name: Deploy MkDocs site
 
+# Запускать при пуше в main или master, а также вручную
 on:
   push:
     branches:
@@ -17,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure Git
+      - name: Configure Git Credentials
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -26,7 +27,21 @@ jobs:
         with:
           python-version: 3.x
 
-      - run: pip install --upgrade pip
-      - run: pip install mkdocs-material
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-      - run: mkdocs gh-deploy --force
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install mkdocs-material
+          # Если есть requirements.txt, можно:
+          # pip install -r requirements.txt
+
+      - name: Deploy to GitHub Pages
+        run: |
+          mkdocs gh-deploy --force
