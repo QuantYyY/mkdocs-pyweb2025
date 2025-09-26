@@ -1,2 +1,4 @@
 site_name: MkDocs PyWeb2025
 site_url: https://QuantYyY.github.io/mkdocs-pyweb2025/
+theme:
+  name: material
